@@ -4,7 +4,17 @@
     [clojure.string :as cljstr]
     [clojure.set :as cljset]))
 
-  (def sample "")
+(def sample
+"MMMSXXMASM
+MSAMXMSMSA
+AMXSXMAAMM
+MSAMASMSMX
+XMASAMXAMM
+XXAMMXXAMA
+SMSMSASXSS
+SAXAMASAAA
+MAMMMXMMMM
+MXMXAXMASX")
 
   (defn parse-input
   [input]
@@ -41,4 +51,4 @@
   ;;  (prn (d4p2 sample))
   ;;  (prn (d4p2 (slurp "input/day4.txt")))
   )
-  
+
