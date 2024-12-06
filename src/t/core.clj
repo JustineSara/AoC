@@ -1055,11 +1055,73 @@
     ))
 
 
+(def input-test-d2
+  "7 6 4 2 1
+  1 2 7 8 9
+  9 7 6 2 1
+  1 3 2 4 5
+  8 6 4 4 1
+  1 3 6 7 9")
+(def input-d2
+  (slurp "input/d2.txt"))
+
+(defn parse-d2
+  [input]
+  (->>
+    (-> input
+        (cljstr/split #"\n"))
+    (map (fn [s] (->> (cljstr/split s #" ")
+                      (filter (fn [x] (not= x "")) )
+                      (map parse-long))))))
+
+(defn solve-d2-p1
+  [input]
+  (let [inp (parse-d2 input)]
+    (->> inp
+       (map (fn [x]
+              (map (fn [a b] (- a b)) x (rest x))))
+       (filter (fn [coll] (every? (fn [x] (< x 4)) coll)))
+       (filter (fn [coll] (every? (fn [x] (> x -4)) coll)))
+       (filter (fn [coll] (or (every? pos? coll)
+                              (every? neg? coll))))
+       count
+       )))
+
+(defn safe
+  [coll]
+  (let [diff (map (fn [a b] (- a b))  coll (rest coll))]
+    (or
+      (every? (fn [x] (< 0 x 4)) diff)
+      (every? (fn [x] (< -4 x 0)) diff))))
+
+(defn safe-when-drop-one
+  [coll]
+  (loop [i 0]
+    (let [the-coll (concat (take i coll) (drop (inc i) coll))]
+      (if (safe the-coll)
+        true
+        (if (= i (dec (count coll)))
+          false
+          (recur (inc i)))))))
+
+(defn solve-d2-p2
+  [input]
+  (let [inp (parse-d2 input)]
+    (->> inp
+       (filter (fn [coll] (or (safe coll)
+                              (safe-when-drop-one coll))))
+       count
+       )))
+
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
   (println "Hello, World!")
-  (prn (parse-d1 input-test-d1))
-  (prn (solve-d1-p2 input-test-d1))
-  (prn (solve-d1-p2 input-d1))
+  ;;  (prn (parse-d1 input-test-d1))
+  ;;  (prn (solve-d1-p2 input-test-d1))
+  ;;  (prn (solve-d1-p2 input-d1))
+  (prn (parse-d2 input-test-d2))
+  (prn (solve-d2-p2 input-test-d2))
+  (prn (solve-d2-p2 input-d2))
+  ;; 631 is too high
   )
