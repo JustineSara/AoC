@@ -88,12 +88,65 @@
       (map parse-long)
       (apply +))))
 
+(defn smaller?
+  [x1 x2 rules]
+  (cond
+    (contains? rules [x1 x2]) true
+    (contains? rules [x2 x1]) false
+    :else nil
+  ))
+
+(defn place-num
+  [list-p p rules]
+  (loop [i 0
+         r rules]
+    (if (= i (count list-p))
+      [(conj list-p p) r]
+      (let [current-p (nth list-p i)
+            sm (smaller? p current-p r)]
+        (cond
+          (nil? sm)
+          (recur (inc i) r)
+          sm
+          [(vec (concat (take i list-p) [p] (nthrest list-p i)))  (disj r [p current-p])]
+          (not sm)
+          (recur (inc i) (disj r [current-p p])))))))
+
+(defn order-update
+  [upd rules]
+  (let [filtered-rules (->> rules
+                            (filter (fn [r]
+                                      (some (fn [upd-num] (= upd-num (first r)))
+                                            upd)))
+                            (filter (fn [r]
+                                      (some (fn [upd-num] (= upd-num (second r)))
+                                            upd)))
+                            set)
+        N-upd (count upd)]
+    (loop [page (second upd)
+           upd- (nthrest upd 2)
+           new-upd [(first upd)]
+           f-rules filtered-rules]
+      (if (nil? page)
+        new-upd
+        (let [[ord-upd new-f-r] (place-num new-upd page f-rules)]
+          (recur (first upd-)
+                 (rest upd-)
+                 ord-upd
+                 new-f-r))))))
+
 (defn d5p2
   [input]
-  (let [x (parse-input input)
+  (let [{:keys [rules updates]} (parse-input input)
+        upd (first updates)
         ]
-    x
-    ))
+    (->>
+      updates
+      (filter (fn [upd] (not (valid-update? rules upd))))
+      (map (fn [upd] (order-update upd rules)))
+      (map select-mid-num)
+      (map parse-long)
+      (apply +))))
 
 (defn -main
   [& args]
@@ -103,11 +156,11 @@
 
   (println "part1")
   (prn (d5p1 sample))
-  (prn (d5p1 (slurp "input/day5.txt")))
+;;  (prn (d5p1 (slurp "input/day5.txt")))
 
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d5p2 sample))
-  ;;  (prn (d5p2 (slurp "input/day5.txt")))
+  (newline)
+  (println "part2")
+  (prn (d5p2 sample))
+  (prn (d5p2 (slurp "input/day5.txt")))
   )
 
