@@ -86,7 +86,7 @@ MXMXAXMASX")
       (contains? Ms [(+ x dx)       (+ y dy)])
       (contains? As [(+ x dx dx)    (+ y dy dy)])
       (contains? Ss [(+ x dx dx dx) (+ y dy dy dy)])
-      )))
+      ))
 
 (defn d4p1
   [input]
