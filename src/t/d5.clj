@@ -36,16 +36,57 @@
 
 (defn parse-input
   [input]
-  (cljstr/split-lines input)
-  )
+  (-> input
+      (cljstr/split #"\n\n")
+      ((fn [[r u]] {
+                    :rules
+                    (->> r
+                         (cljstr/split-lines)
+                         (map (fn [rule] (cljstr/split rule #"\|"))))
+                    :updates
+                    (->> u
+                         (cljstr/split-lines)
+                         (map (fn [upd] (cljstr/split upd #","))))
+                    }))))
 
+(defn valid-update?
+  [rules upd]
+  (let [
+        filtered-rules (->> rules
+                            (filter (fn [r]
+                                      (some (fn [upd-num] (= upd-num (first r)))
+                                            upd)))
+                            (filter (fn [r]
+                                      (some (fn [upd-num] (= upd-num (second r)))
+                                            upd)))
+                            )]
+    (loop [up-page (first upd)
+           up-rests (rest upd)
+           rules-tbt filtered-rules]
+      (if (nil? up-page)
+        true
+        (let [new-rules-tbt (filter (fn [r] (not= (first r) up-page)) rules-tbt)
+              not-met-rules (filter (fn [r] (=   (second r) up-page)) rules-tbt)]
+          (cond
+            (> (count not-met-rules) 0) false
+            (empty? new-rules-tbt) true
+            :else (recur (first up-rests) (rest up-rests) new-rules-tbt)))))))
+
+(defn select-mid-num
+  [upd]
+  (let [N (count upd)
+        mid (/ (inc N) 2)]
+    (nth upd (dec mid))))
 
 (defn d5p1
   [input]
-  (let [x (parse-input input)
-        ]
-    x
-    ))
+  (let [{:keys [rules updates]} (parse-input input)]
+    (->>
+      updates
+      (filter (fn [upd] (valid-update? rules upd)))
+      (map select-mid-num)
+      (map parse-long)
+      (apply +))))
 
 (defn d5p2
   [input]
@@ -62,7 +103,7 @@
 
   (println "part1")
   (prn (d5p1 sample))
-  ;;  (prn (d5p1 (slurp "input/day5.txt")))
+  (prn (d5p1 (slurp "input/day5.txt")))
 
   ;;  (newline)
   ;;  (println "part2")
