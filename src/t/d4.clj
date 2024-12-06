@@ -81,11 +81,7 @@ MXMXAXMASX")
 )
 
 (defn xmas?
-  [xpos dir Ms As Ss]
-  (let [x (first xpos)
-        y (second xpos)
-        dx (first dir)
-        dy (second dir)]
+  [[x y] [dx dy] Ms As Ss]
     (and
       (contains? Ms [(+ x dx)       (+ y dy)])
       (contains? As [(+ x dx dx)    (+ y dy dy)])
