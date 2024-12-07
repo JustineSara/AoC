@@ -111,8 +111,7 @@
                     (recur n-info (conj Gpos n-pos)))))
         W-pos (disj W-pos (get-in info-start [:map :G 0]))]
     (->> W-pos
-         (map (fn [new-O] (loop? (conj obstacles new-O) G-start xmax ymax)))
-         (filter identity)
+         (filter (fn [new-O] (loop? (conj obstacles new-O) G-start xmax ymax)))
          count
          )
     ))
