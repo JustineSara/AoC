@@ -75,12 +75,48 @@
           (recur n-info (conj Gpos n-pos)))))
     ))
 
+
+(defn one-step-move-p2
+  [obstacles guard]
+  (let [[g-pos g-dir] guard
+        [new-pos new-dir] (new-pos g-pos g-dir)
+        occupied? (contains? obstacles new-pos)]
+    (if occupied?
+      (recur obstacles [g-pos new-dir])
+      [new-pos g-dir])))
+
+
+(defn loop?
+  [obstacles G x-max y-max]
+  (loop [currentG G
+         allG (set [G])]
+    (let [nG (one-step-move-p2 obstacles currentG)]
+      (cond
+        (outside (first nG) x-max y-max) false
+        (contains? allG nG) true
+        :else (recur nG (conj allG nG))))))
+
 (defn d6p2
   [input]
-  (let [x (parse-input input)
-        ]
-    x
+  (let [info-start (parse-input input)
+        obstacles (get-in info-start [:map :O])
+        xmax (:x-max info-start)
+        ymax (:y-max info-start)
+        G-start (get-in info-start [:map :G])
+        W-pos (loop [info info-start
+                     Gpos (set [(get-in info-start [:map :G 0])])]
+                (let [[n-info n-pos] (one-step-move info)]
+                  (if (outside n-pos (:x-max info) (:y-max info))
+                    Gpos
+                    (recur n-info (conj Gpos n-pos)))))
+        W-pos (disj W-pos (get-in info-start [:map :G 0]))]
+    (->> W-pos
+         (map (fn [new-O] (loop? (conj obstacles new-O) G-start xmax ymax)))
+         (filter identity)
+         count
+         )
     ))
+
 
 (defn -main
   [& args]
@@ -90,11 +126,11 @@
 
   (println "part1")
   (prn (d6p1 sample))
-  (prn (d6p1 (slurp "input/day6.txt")))
+;;  (prn (d6p1 (slurp "input/day6.txt")))
 
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d6p2 sample))
-  ;;  (prn (d6p2 (slurp "input/day6.txt")))
+  (newline)
+  (println "part2")
+  (prn (d6p2 sample))
+  (prn (d6p2 (slurp "input/day6.txt")))
   )
 
