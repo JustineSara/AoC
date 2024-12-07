@@ -26,15 +26,6 @@
                  :nums nums})))))
 
 
-(defn test-2-nums
-  [x1 x2 res]
-  (let [mult (* x1 x2)
-        addi (+ x1 x2)]
-    (cond
-      (= mult res) true
-      (= addi res) true
-      :else false)))
-
 (defn test-recur
   [x xs res]
   (if (empty? xs)
