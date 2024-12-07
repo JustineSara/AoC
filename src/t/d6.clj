@@ -2,7 +2,8 @@
   (:gen-class)
   (:require
     [clojure.string :as cljstr]
-    [clojure.set :as cljset]))
+    [clojure.set :as cljset]
+    [clojure.core.match :refer [match]]))
 
 (def sample
 "....#.....
@@ -37,31 +38,40 @@
                         )))
           (apply merge-with into))}))
 
+(defn new-pos
+  [[gx gy] g-dir]
+  (match g-dir
+    :up [[gx (dec gy)] :right]
+    :right [[(inc gx) gy] :down]
+    :down [[gx (inc gy)] :left]
+    :left [[(dec gx) gy] :up]))
+
 (defn one-step-move
   [info]
   (let [obstacles (get-in info [:map :O])
-        [[gx gy] g-dir] (get-in info [:map :G])]
-    (cond
-      (= g-dir :up)
-      (let [up-pos [gx (dec gy)]
-            occupied? (contains? obstacles up-pos)]
-        (if occupied?
-          (recur (assoc-in info [:map :G 1] :right))
-          [(assoc-in info [:map :G 0] up-pos) up-pos]))
-      :else
-      [-1 -1]
-      )))
+        [g-pos g-dir] (get-in info [:map :G])
+        [new-pos new-dir] (new-pos g-pos g-dir)
+        occupied? (contains? obstacles new-pos)]
+    (if occupied?
+      (recur (assoc-in info [:map :G 1] new-dir))
+      [(assoc-in info [:map :G 0] new-pos) new-pos])))
 
+(defn outside
+  [[x y] x-max y-max]
+  (or (< x 0)
+      (< x-max x)
+      (< y 0)
+      (< y-max y))
+  )
 
 (defn d6p1
   [input]
-  (let [info-start (parse-input input)
-        ]
+  (let [info-start (parse-input input) ]
     (loop [info info-start
            Gpos (set [(get-in info-start [:map :G 0])])]
       (let [[n-info n-pos] (one-step-move info)]
-        (prn n-pos)
-        (if (= n-info -1) nil
+        (if (outside n-pos (:x-max info) (:y-max info))
+          (count Gpos)
           (recur n-info (conj Gpos n-pos)))))
     ))
 
@@ -80,7 +90,7 @@
 
   (println "part1")
   (prn (d6p1 sample))
-  ;;  (prn (d6p1 (slurp "input/day6.txt")))
+  (prn (d6p1 (slurp "input/day6.txt")))
 
   ;;  (newline)
   ;;  (println "part2")
