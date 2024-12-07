@@ -32,7 +32,7 @@
                         (map-indexed
                           (fn [x c]
                             (cond
-                              (= c \#) {:O (set [[x y]])}
+                              (= c \#) {:O #{[x y]}}
                               (= c \^) {:G [[x y] :up]})))
                         (apply merge-with into)
                         )))
