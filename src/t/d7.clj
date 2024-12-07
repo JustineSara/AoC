@@ -33,24 +33,59 @@
     (cond
       (= mult res) true
       (= addi res) true
-      :else false)
-    )
-  )
+      :else false)))
+
+(defn test-recur
+  [x xs res]
+  (if (empty? xs)
+    (= x res)
+    (let [x2 (first xs)
+          xsrest (rest xs)
+          mult (* x x2)
+          addi (+ x x2)]
+      (cond-> false
+        (<= mult res) (or (test-recur mult xsrest res))
+        (<= addi res) (or (test-recur addi xsrest res))
+      ))
+  ))
 
 (defn d7p1
   [input]
-  (let [x (parse-input input)
-        xx (first x)]
-    (prn xx)
-    (test-2-nums (first (:nums xx)) (second (:nums xx)) (:result xx))
-    ))
+  (let [x (parse-input input)]
+    (->> x
+         (map (fn [xx]
+                [(test-recur (first (:nums xx)) (rest (:nums xx)) (:result xx))
+                 (:result xx)]))
+         (filter first)
+         (map second)
+         (apply +)
+    )))
+
+(defn test-p2
+  [x xs res]
+  (if (empty? xs)
+    (= x res)
+    (let [x2 (first xs)
+          xsrest (rest xs)
+          mult (* x x2)
+          addi (+ x x2)
+          conc (parse-long (str x x2))]
+      (cond-> false
+        (<= mult res) (or (test-p2 mult xsrest res))
+        (<= addi res) (or (test-p2 addi xsrest res))
+        (<= conc res) (or (test-p2 conc xsrest res))))))
 
 (defn d7p2
   [input]
   (let [x (parse-input input)
-        ]
-    x
-    ))
+        xx (nth x 4)]
+    (->> x
+         (map (fn [xx]
+                [(test-p2 (first (:nums xx)) (rest (:nums xx)) (:result xx))
+                 (:result xx)]))
+         (filter first)
+         (map second)
+         (apply +))))
 
 (defn -main
   [& args]
@@ -58,13 +93,13 @@
   (println sample)
   (newline)
 
-  (println "part1")
-  (prn (d7p1 sample))
+;;  (println "part1")
+;;  (prn (d7p1 sample))
   ;;  (prn (d7p1 (slurp "input/day7.txt")))
 
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d7p2 sample))
-  ;;  (prn (d7p2 (slurp "input/day7.txt")))
+  (newline)
+  (println "part2")
+  (prn (d7p2 sample))
+  (prn (d7p2 (slurp "input/day7.txt")))
   )
 
