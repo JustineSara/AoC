@@ -22,14 +22,27 @@
        (map (fn [line]
               (let [[result list-nums] (cljstr/split line #": ")
                     nums (map parse-long (cljstr/split list-nums #" "))]
-                {:result result :nums nums})))))
+                {:result (parse-long result)
+                 :nums nums})))))
 
+
+(defn test-2-nums
+  [x1 x2 res]
+  (let [mult (* x1 x2)
+        addi (+ x1 x2)]
+    (cond
+      (= mult res) true
+      (= addi res) true
+      :else false)
+    )
+  )
 
 (defn d7p1
   [input]
   (let [x (parse-input input)
-        ]
-    x
+        xx (first x)]
+    (prn xx)
+    (test-2-nums (first (:nums xx)) (second (:nums xx)) (:result xx))
     ))
 
 (defn d7p2
