@@ -17,8 +17,12 @@
 
 (defn parse-input
   [input]
-  (cljstr/split-lines input)
-  )
+  (->> input
+       cljstr/split-lines
+       (map (fn [line]
+              (let [[result list-nums] (cljstr/split line #": ")
+                    nums (map parse-long (cljstr/split list-nums #" "))]
+                {:result result :nums nums})))))
 
 
 (defn d7p1
