@@ -4,29 +4,41 @@
     [clojure.string :as cljstr]
     [clojure.set :as cljset]))
 
-  (def sample "")
+(def sample
+"............
+........0...
+.....0......
+.......0....
+....0.......
+......A.....
+............
+............
+........A...
+.........A..
+............
+............")
 
-  (defn parse-input
+(defn parse-input
   [input]
   (cljstr/split-lines input)
   )
 
 
-  (defn d8p1
+(defn d8p1
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn d8p2
+(defn d8p2
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn -main
+(defn -main
   [& args]
   (println "day8")
   (println sample)
@@ -41,4 +53,4 @@
   ;;  (prn (d8p2 sample))
   ;;  (prn (d8p2 (slurp "input/day8.txt")))
   )
-  
+
