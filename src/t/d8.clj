@@ -20,8 +20,21 @@
 
 (defn parse-input
   [input]
-  (cljstr/split-lines input)
-  )
+  (let [lines (cljstr/split-lines input)
+        ymax (dec (count lines))
+        xmax (dec (count (first lines)))]
+  {:xmax xmax
+   :ymax ymax
+   :antenas
+   (->> lines
+        (map-indexed
+          (fn [y l] (map-indexed
+                      (fn [x c] (when (not= c \.) {c [[x y]]}))
+                      l)))
+        (reduce concat)
+        (filter identity)
+        (apply merge-with into)
+        )}))
 
 
 (defn d8p1
