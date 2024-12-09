@@ -9,15 +9,39 @@
 
 (defn parse-input
   [input]
-  (cljstr/split-lines input)
+  (map (comp parse-long str) input)
   )
 
+
+(defn space
+  [input]
+  (loop [i (first input)
+         r (rest input)
+         free-space []
+         occupied-space []
+         id-occupied 0
+         pos 0
+         occupied? true]
+    (if (nil? i)
+      {:free free-space
+       :occupied occupied-space}
+      (let [n-pos (+ pos i)
+            n-free-space (if occupied?
+                           free-space
+                           (conj free-space {:pos-min pos :pos-max (dec n-pos) :size i}))
+            n-occupied-space (if occupied?
+                               (conj occupied-space {:file-id id-occupied :pos-min pos :pos-max (dec n-pos)})
+                               occupied-space)
+            n-id-occupied (if occupied?
+                            (inc id-occupied)
+                            id-occupied)]
+        (recur (first r) (rest r) n-free-space n-occupied-space n-id-occupied n-pos (not occupied?))))))
 
 (defn d9p1
   [input]
   (let [x (parse-input input)
         ]
-    x
+    (space x)
     ))
 
 (defn d9p2
