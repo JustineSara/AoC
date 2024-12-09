@@ -101,6 +101,8 @@
     (cond
       ;; tested all free space
       (nil? free) [file free-space]
+      ;; the file is moving down not up if going there
+      (< pos-min (:pos-min free)) [file free-space]
       ;; sizes are equal
       (= file-size (:size free)) [(-> file
                                       (assoc :pos-min (:pos-min free))
@@ -150,5 +152,6 @@
   (prn (d9p2 sample))
   (prn (d9p2 (slurp "input/day9.txt")))
   ;; 8468892803578       too high  --> forgot to check I wasn't moving the files further away !
+  ;; 6307279963620
   )
 
