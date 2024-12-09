@@ -58,7 +58,6 @@
         (let [to-be-filled (first f-space)
               to-be-moved (first o-space)
               size-diff (- (:size to-be-filled) (:file-size to-be-moved))]
-          (prn [:free to-be-filled :occ to-be-moved])
           (cond
             ;; case 0 : the position of the file is before the free space
             (< (:pos-min to-be-moved) (:pos-min to-be-filled))
@@ -69,7 +68,6 @@
                               :pos-min (:pos-min to-be-filled)
                               :pos-max (:pos-max to-be-filled)
                               :file-size (:file-size to-be-moved)}]
-              (prn [:same-size :new-file moved-file])
               (recur (rest f-space) (sort-by :pos-min > (conj (rest o-space) moved-file))))
             ;; case 2 : more free space
             (pos? size-diff)
@@ -81,7 +79,6 @@
                   left-over-free-space {:pos-min new-free-min
                                         :pos-max (:pos-max to-be-filled)
                                         :size (- (:size to-be-filled) (:file-size to-be-moved))}]
-              (prn [:more-free-space :new-free-space left-over-free-space :new-file moved-file])
               (recur (sort-by :pos-min (conj (rest f-space) left-over-free-space)) (sort-by :pos-min > (conj (rest o-space) moved-file))))
             ;; case 3 : file larger than free space
             (neg? size-diff)
@@ -93,15 +90,8 @@
                   left-over-file (-> to-be-moved
                                      (assoc :pos-max new-file-max)
                                      (update :file-size - (:size to-be-filled))) ]
-              (prn [:file-bigger :new-file-moved moved-file :left-over-file left-over-file])
               (recur (rest f-space) (sort-by :pos-min > (conj (rest o-space) moved-file left-over-file))))
-            :else (prn ["case not done?!" :size-diff size-diff :to-be-moved to-be-moved :to-de-filled to-be-filled])
-            )
-
-          )
-        )
-      )
-    ))
+            :else (prn ["case not done?!" :size-diff size-diff :to-be-moved to-be-moved :to-de-filled to-be-filled])))))))
 
 (defn d9p2
   [input]
@@ -118,7 +108,7 @@
 
   (println "part1")
   (prn (d9p1 sample))
-  ;;  (prn (d9p1 (slurp "input/day9.txt")))
+  (prn (d9p1 (slurp "input/day9.txt")))
 
   ;;  (newline)
   ;;  (println "part2")
