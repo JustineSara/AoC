@@ -93,12 +93,47 @@
               (recur (rest f-space) (sort-by :pos-min > (conj (rest o-space) moved-file left-over-file))))
             :else (prn ["case not done?!" :size-diff size-diff :to-be-moved to-be-moved :to-de-filled to-be-filled])))))))
 
+(defn move-file
+  [{:keys [file-id pos-min pos-max file-size] :as file} free-space]
+  (loop [free (first free-space)
+         r-free (rest free-space)
+         tested-free []]
+    (cond
+      ;; tested all free space
+      (nil? free) [file free-space]
+      ;; sizes are equal
+      (= file-size (:size free)) [(-> file
+                                      (assoc :pos-min (:pos-min free))
+                                      (assoc :pos-max (:pos-max free)))
+                                  (sort-by :pos-min (concat tested-free r-free))]
+      ;; more free space
+      (< file-size (:size free)) [(-> file
+                                      (assoc :pos-min (:pos-min free))
+                                      (assoc :pos-max (dec (+ (:pos-min free) file-size))))
+                                  (sort-by :pos-min (concat tested-free
+                                                            [{:pos-min (+ (:pos-min free) file-size)
+                                                              :pos-max (:pos-max free)
+                                                              :size (- (:size free) file-size)}]
+                                                            r-free))]
+      ;; not enough space, test next one
+      (> file-size (:size free)) (recur (first r-free) (rest r-free) (conj tested-free free)))))
+
 (defn d9p2
   [input]
   (let [x (parse-input input)
-        ]
-    x
-    ))
+        {:keys [free occupied]} (space x)
+        free (sort-by :pos-min free)
+        occupied (sort-by :file-id > occupied)]
+    (loop [old-o occupied
+           new-o []
+           f-space free]
+      (if (empty? old-o)
+        (checksum new-o)
+        (let [file (first old-o)
+              [n-file n-free-space] (move-file file f-space)]
+          (recur (rest old-o)
+                 (conj new-o n-file)
+                 n-free-space))))))
 
 (defn -main
   [& args]
@@ -108,11 +143,12 @@
 
   (println "part1")
   (prn (d9p1 sample))
-  (prn (d9p1 (slurp "input/day9.txt")))
+;;  (prn (d9p1 (slurp "input/day9.txt")))
 
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d9p2 sample))
-  ;;  (prn (d9p2 (slurp "input/day9.txt")))
+  (newline)
+  (println "part2")
+  (prn (d9p2 sample))
+  (prn (d9p2 (slurp "input/day9.txt")))
+  ;; 8468892803578       too high  --> forgot to check I wasn't moving the files further away !
   )
 
