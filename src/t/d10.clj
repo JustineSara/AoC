@@ -5,29 +5,37 @@
     [clojure.set :as cljset]
     [clojure.core.match :refer [match]]))
 
-  (def sample "")
+(def sample
+"89010123
+78121874
+87430965
+96549874
+45678903
+32019012
+01329801
+10456732")
 
-  (defn parse-input
+(defn parse-input
   [input]
   (cljstr/split-lines input)
   )
 
 
-  (defn d10p1
+(defn d10p1
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn d10p2
+(defn d10p2
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn -main
+(defn -main
   [& args]
   (println "day10")
   (println sample)
@@ -42,4 +50,4 @@
   ;;  (prn (d10p2 sample))
   ;;  (prn (d10p2 (slurp "input/day10.txt")))
   )
-  
+
