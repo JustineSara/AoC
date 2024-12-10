@@ -41,11 +41,7 @@
 
 (defn d10p1
   [input]
-  (let [x (parse-input input)
-        one-start (first (get x 0))
-        ]
-    (prn one-start)
-    (prn (find-next-steps one-start (get x 1)))
+  (let [x (parse-input input)]
     (loop [paths #{}
            to-explore (map (fn [pos] [0 pos pos]) (get x 0))]
       (if (empty? to-explore)
@@ -53,17 +49,9 @@
         (let [[height pos start-pos] (first to-explore)
               next-h (inc height)
               next-pos (find-next-steps pos (get x next-h))]
-          (prn "~~~~~~~~")
-          (prn to-explore)
-          (prn paths)
-          (prn [:current height pos])
-          (prn [:next next-h next-pos])
           (if (= next-h 9)
             (recur (cljset/union paths (set (map (fn [end-pos] [start-pos end-pos]) next-pos))) (rest to-explore))
-            (recur paths (concat (rest to-explore) (map (fn [pos] [next-h pos start-pos]) next-pos))))
-        )
-      )
-    )))
+            (recur paths (concat (rest to-explore) (map (fn [pos] [next-h pos start-pos]) next-pos)))))))))
 
 (defn d10p2
   [input]
@@ -80,7 +68,7 @@
 
   (println "part1")
   (prn (d10p1 sample))
-  ;;  (prn (d10p1 (slurp "input/day10.txt")))
+  (prn (d10p1 (slurp "input/day10.txt")))
 
   ;;  (newline)
   ;;  (println "part2")
