@@ -91,7 +91,7 @@
                                      (assoc :pos-max new-file-max)
                                      (update :file-size - (:size to-be-filled))) ]
               (recur (rest f-space) (sort-by :pos-min > (conj (rest o-space) moved-file left-over-file))))
-            :else (prn ["case not done?!" :size-diff size-diff :to-be-moved to-be-moved :to-de-filled to-be-filled])))))))
+            :else (prn ["case not done?!" :size-diff size-diff :to-be-moved to-be-moved :to-be-filled to-be-filled])))))))
 
 (defn move-file
   [{:keys [file-id pos-min pos-max file-size] :as file} free-space]
