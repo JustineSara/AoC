@@ -17,8 +17,21 @@
 
 (defn parse-input
   [input]
-  (cljstr/split-lines input)
-  )
+  (->> (cljstr/split-lines input)
+       (map vec)
+       (map-indexed
+         (fn [y l]
+           (->> l
+           (map-indexed
+             (fn [x c] {c [[x y]]})
+             )
+           (apply merge-with into))))
+       (apply merge-with into)
+  ))
+
+(def dirs
+  [[0 1] [0 -1] [1 0] [-1 0]])
+
 
 
 (defn d10p1
