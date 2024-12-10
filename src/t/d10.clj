@@ -55,10 +55,17 @@
 
 (defn d10p2
   [input]
-  (let [x (parse-input input)
-        ]
-    x
-    ))
+  (let [x (parse-input input)]
+    (loop [count-paths 0
+           to-explore (map (fn [pos] [0 pos]) (get x 0))]
+      (if (empty? to-explore)
+        count-paths
+        (let [[height pos] (first to-explore)
+              next-h (inc height)
+              next-pos (find-next-steps pos (get x next-h))]
+          (if (= next-h 9)
+            (recur (+ count-paths (count next-pos)) (rest to-explore))
+            (recur count-paths (concat (rest to-explore) (map (fn [pos] [next-h pos]) next-pos)))))))))
 
 (defn -main
   [& args]
@@ -68,11 +75,11 @@
 
   (println "part1")
   (prn (d10p1 sample))
-  (prn (d10p1 (slurp "input/day10.txt")))
+;;  (prn (d10p1 (slurp "input/day10.txt")))
 
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d10p2 sample))
-  ;;  (prn (d10p2 (slurp "input/day10.txt")))
+  (newline)
+  (println "part2")
+  (prn (d10p2 sample))
+  (prn (d10p2 (slurp "input/day10.txt")))
   )
 
