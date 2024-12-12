@@ -5,29 +5,56 @@
     [clojure.set :as cljset]
     [clojure.core.match :refer [match]]))
 
-  (def sample "")
+(def sample1
+"AAAA
+BBCD
+BBCC
+EEEC
+")
+(def sol1 140)
 
-  (defn parse-input
+(def sample2
+"OOOOO
+OXOXO
+OOOOO
+OXOXO
+OOOOO")
+(def sol2 772)
+
+(def sample3
+"RRRRIICCFF
+RRRRIICCCF
+VVRRRCCFFF
+VVRCCCJFFF
+VVVVCJJCFE
+VVIVCCJJEE
+VVIIICJJEE
+MIIIIIJJEE
+MIIISIJEEE
+MMMISSJEEE")
+(def sol3 1930)
+
+(defn parse-input
   [input]
   (cljstr/split-lines input)
   )
 
 
-  (defn d12p1
+(defn d12p1
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn d12p2
+(defn d12p2
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn -main
+(defn -main
   [& args]
   (println "day12")
   (println sample)
@@ -42,4 +69,4 @@
   ;;  (prn (d12p2 sample))
   ;;  (prn (d12p2 (slurp "input/day12.txt")))
   )
-  
+
