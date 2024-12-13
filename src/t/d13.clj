@@ -25,22 +25,64 @@ Prize: X=18641, Y=10279
 
 (defn parse-input
   [input]
-  (cljstr/split-lines input)
-  )
+   (->>
+     (re-seq #"Button A: X\+(\d+), Y\+(\d+)\nButton B: X\+(\d+), Y\+(\d+)\nPrize: X=(\d+), Y=(\d+)" input)
+     (map (fn [m] (rest m)))
+     (map (fn [m] (map parse-long m)))
+;;     (map (fn [[_ xA yA xB yB X Y]] {:A [xA yA] :B [xB yB] :P [X Y]}))
+    ))
 
+(defn win-prize?
+  [ia ib [xa ya xb yb X Y]]
+  (and
+    (= X (+ (* ia xa) (* ib xb)))
+    (= Y (+ (* ia ya) (* ib yb)))))
+
+(defn test-one-machine
+  [m]
+  (let [win-costs
+        (for [iA (range 100)
+              iB (range 100)
+              :when (win-prize? iA iB m) ]
+          (+ (* 3 iA) (* 1 iB)))]
+    (if (empty? win-costs) 0
+        (apply min win-costs))))
 
 (defn d13p1
   [input]
-  (let [x (parse-input input)
+  (let [machines (parse-input input)
+        m (first machines)
         ]
-    x
-    ))
+    (->> machines
+         (map test-one-machine)
+         (apply +))))
+
+
+(defn iA-and-iB
+  [[xa ya xb yb X Y :as m]]
+  (let [iB (quot (- (* Y  xa) (* ya X ))
+                 (- (* yb xa) (* ya xb)))
+        iA (quot (- X (* iB xb))
+                 xa)]
+    [iA iB m]))
+
+(defn cost
+  [[iA iB _]]
+  (+ (* 3 iA) (* 1 iB)))
 
 (defn d13p2
   [input]
-  (let [x (parse-input input)
+  (let [machines (parse-input input)
         ]
-    x
+    (->> machines
+         (map (fn [[xa ya xb yb X Y]] [xa ya xb yb (+ 10000000000000 X) (+ 10000000000000 Y)]))
+         (map iA-and-iB)
+         (filter (comp pos? second))
+         (filter (comp pos? first))
+         (filter (fn [[iA iB m]] (win-prize? iA iB m)))
+         (map cost)
+         (apply +)
+         )
     ))
 
 (defn -main
@@ -51,11 +93,11 @@ Prize: X=18641, Y=10279
 
   (println "part1")
   (prn (d13p1 sample))
-  ;;  (prn (d13p1 (slurp "input/day13.txt")))
+;;  (prn (d13p1 (slurp "input/day13.txt")))
 
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d13p2 sample))
-  ;;  (prn (d13p2 (slurp "input/day13.txt")))
+  (newline)
+  (println "part2")
+  (prn (d13p2 sample))
+  (prn (d13p2 (slurp "input/day13.txt")))
   )
 
