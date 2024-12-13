@@ -27,8 +27,7 @@ Prize: X=18641, Y=10279
   [input]
    (->>
      (re-seq #"Button A: X\+(\d+), Y\+(\d+)\nButton B: X\+(\d+), Y\+(\d+)\nPrize: X=(\d+), Y=(\d+)" input)
-     (map (fn [m] (rest m)))
-     (map (fn [m] (map parse-long m)))
+     (map (fn [[_ & m]] (map parse-long m)))
 ;;     (map (fn [[_ xA yA xB yB X Y]] {:A [xA yA] :B [xB yB] :P [X Y]}))
     ))
 
