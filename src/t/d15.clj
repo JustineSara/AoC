@@ -247,11 +247,11 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^")
     ;; try to move the robot
     (cond
       (contains? walls n-robot) [robot box-l box-r]
-      (contains? (cljset/union box-l box-r) n-robot) (case symb
-                                                       \> (move-right robot box-l box-r walls)
-                                                       \< (move-left  robot box-l box-r walls)
-                                                       \v (move-down  robot box-l box-r walls)
-                                                       \^ (move-up    robot box-l box-r walls))
+      (contains? (cljset/union box-l box-r) n-robot) ((case symb
+                                                        \> move-right
+                                                        \< move-left
+                                                        \v move-down
+                                                        \^ move-up) robot box-l box-r walls))
       :else [n-robot box-l box-r])))
 
 
