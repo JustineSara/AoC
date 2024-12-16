@@ -94,7 +94,7 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^")
         (recur (cljset/union might-move #{try-move}) npos (disj boxes npos))
         (contains? walls npos)
         [robot (cljset/union might-move #{try-move} boxes)]
-        :else
+        "We have found an empty space, all boxes tried so far can move."
         [(map + robot dir) (->> try-move
                                 (conj might-move)
                                 (map (fn [b] (map + b dir)))
