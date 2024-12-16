@@ -75,9 +75,9 @@ v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^")
                   (cljstr/replace "\n" ""))]
   [warehouse moves]))
 
-(defn symb-to-dir
-  [symb]
-  (case symb
+(defn char-to-dir
+  [c]
+  (case c
     \> [+1 0]
     \< [-1 0]
     \v [0 +1]
