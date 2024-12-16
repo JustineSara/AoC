@@ -23,6 +23,7 @@
 ###############
 ")
 (def sol1 7036)
+(def sol1p2 45)
 
 (def sample2
 "#################
@@ -44,6 +45,7 @@
 #################
 ")
 (def sol2 11048)
+(def sol2p2 64)
 
 
 (defn parse-input
@@ -115,10 +117,32 @@
     )))
 
 (defn d16p2
-  [input]
-  (let [x (parse-input input)
+  [input best-score]
+  (let [{:keys [walls start end]} (parse-input input)
+        walls (set walls)
+        start (first start)
+        end (first end)
+        move-score 1
+        turn-score 1000
+        one-step (def-one-step walls move-score turn-score)
         ]
-    x
+    (loop [runners [[start 0 [1 0] [start]]]
+           explored {[start [1 0]] 0}
+           best-seats []]
+      (if (empty? runners) (count (set best-seats))
+        (let [[r & runners] runners]
+          (if (= (first r) end) (recur runners explored (concat best-seats (last r)))
+            (let [n-r (->> r
+                           butlast
+                           (apply one-step)
+                           (filter (fn [[_ s _]] (<= s best-score)))
+                           (filter (fn [[p s d]] (or (not (contains? explored [p d]))
+                                                     (<= s (get explored [p d]))))))
+                  n-expl (apply merge explored (map (fn [[p s d]] {[p d] s}) n-r))]
+            (recur (sort-by second  (concat runners (map (fn [x] (conj x (conj (last r) (first x)))) n-r))) n-expl best-seats))
+       )
+      )
+    ))
     ))
 
 (defn -main
@@ -127,16 +151,20 @@
   (println sample1)
   (newline)
 
+  (comment
   (println "part1")
   (prn (d16p1 sample1))
   (prn [:sol1 sol1])
   (prn (d16p1 sample2))
   (prn [:sol2 sol2])
   (prn (d16p1 (slurp "input/day16.txt")))
-
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d16p2 sample))
-  ;;  (prn (d16p2 (slurp "input/day16.txt")))
+)
+  (newline)
+  (println "part2")
+  (prn (d16p2 sample1 sol1))
+  (prn [:sol1 sol1p2])
+  (prn (d16p2 sample2 sol2))
+  (prn [:sol1 sol2p2])
+  (prn (d16p2 (slurp "input/day16.txt") 95476))
   )
 
