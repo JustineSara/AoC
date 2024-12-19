@@ -15,13 +15,16 @@ rrbgbr
 ubwu
 bwurrg
 brgr
-bbrgwb")
+bbrgwb
+")
 (def sol 6)
 
 (defn parse-input
   [input]
-  (cljstr/split-lines input)
-  )
+  (let [[towels patterns] (cljstr/split input #"\n\n")
+        towels (map vec (cljstr/split towels #", "))
+        patterns (map vec (cljstr/split-lines patterns)) ]
+    [towels patterns]))
 
 
 (defn d19p1
