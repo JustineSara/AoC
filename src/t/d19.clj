@@ -5,29 +5,40 @@
     [clojure.set :as cljset]
     [clojure.core.match :refer [match]]))
 
-  (def sample "")
+(def sample
+"r, wr, b, g, bwu, rb, gb, br
 
-  (defn parse-input
+brwrr
+bggr
+gbbr
+rrbgbr
+ubwu
+bwurrg
+brgr
+bbrgwb")
+(def sol 6)
+
+(defn parse-input
   [input]
   (cljstr/split-lines input)
   )
 
 
-  (defn d19p1
+(defn d19p1
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn d19p2
+(defn d19p2
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn -main
+(defn -main
   [& args]
   (println "day19")
   (println sample)
@@ -35,6 +46,7 @@
 
   (println "part1")
   (prn (d19p1 sample))
+  (prn sol)
   ;;  (prn (d19p1 (slurp "input/day19.txt")))
 
   ;;  (newline)
@@ -42,4 +54,4 @@
   ;;  (prn (d19p2 sample))
   ;;  (prn (d19p2 (slurp "input/day19.txt")))
   )
-  
+
