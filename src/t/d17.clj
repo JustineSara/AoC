@@ -26,8 +26,7 @@ Program: 0,3,5,4,3,0")
   [input]
   (let [ [_ A B C instr] (re-find #"Register A: (\d+)\nRegister B: (\d+)\nRegister C: (\d+)\n\nProgram: ([\d,?]+)" input)
         instr (->> (cljstr/split instr #",")
-                   (map parse-long)
-                   vec
+                   (mapv parse-long)
                    )]
     [(parse-long A) (parse-long B) (parse-long C) instr]))
 
