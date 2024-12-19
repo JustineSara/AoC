@@ -58,12 +58,35 @@ bbrgwb
 
     ))
 
+
+(defn count-arr
+  [p T]
+  (let [psize (count p)
+        t-exact (some (fn [t] (and
+                                (= psize (count t))
+                                (= t p))) T)
+        t-smaller (filter (fn [t] (and
+                                    (< (count t) psize)
+                                    (every? identity (map = t p))))
+                                    T)
+        ]
+    (+
+     (if t-exact 1 0)
+     (apply +
+            (map
+                (fn[t] (count-arr (drop (count t) p) T))
+                t-smaller)
+              ))
+     ))
+
 (defn d19p2
   [input]
-  (let [x (parse-input input)
+  (let [[T P] (parse-input input)
+        p (first P)
         ]
-    x
-    ))
+    (apply +
+    (map (fn [p] (count-arr p T)) P)
+    )))
 
 (defn -main
   [& args]
@@ -71,14 +94,17 @@ bbrgwb
   (println sample)
   (newline)
 
+  (comment
   (println "part1")
   (prn (d19p1 sample))
   (prn sol)
   (prn (d19p1 (slurp "input/day19.txt")))
+  )
 
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d19p2 sample))
-  ;;  (prn (d19p2 (slurp "input/day19.txt")))
+  (newline)
+  (println "part2")
+  (prn (d19p2 sample))
+  (prn 16)
+  (prn (d19p2 (slurp "input/day19.txt")))
   )
 
