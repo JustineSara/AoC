@@ -62,31 +62,32 @@ bbrgwb
 (defn count-arr
   [p T]
   (let [psize (count p)
-        t-exact (some (fn [t] (and
-                                (= psize (count t))
-                                (= t p))) T)
-        t-smaller (filter (fn [t] (and
-                                    (< (count t) psize)
-                                    (every? identity (map = t p))))
-                                    T)
+        t-valid (filter (fn [t] (and
+                                  (<= (count t) psize)
+                                  (every? identity (map = t p))))
+                        T)
         ]
-    (+
-     (if t-exact 1 0)
-     (apply +
-            (map
-                (fn[t] (count-arr (drop (count t) p) T))
-                t-smaller)
-              ))
-     ))
+    (map
+      (fn[t] (drop (count t) p))
+      t-valid )
+    ))
 
 (defn d19p2
   [input]
   (let [[T P] (parse-input input)
         p (first P)
         ]
-    (apply +
-    (map (fn [p] (count-arr p T)) P)
-    )))
+    (loop [Ps P
+           Narr 0]
+      (if (empty? Ps) Narr
+        (let [[p & Ps] Ps
+              np (count-arr p T)
+              np-notempty (filter #(not (empty? %)) np)
+              ]
+          (recur (concat Ps np-notempty) (+ Narr (- (count np) (count np-notempty))))
+          ))
+      )
+    ))
 
 (defn -main
   [& args]
