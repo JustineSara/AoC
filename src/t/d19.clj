@@ -27,11 +27,35 @@ bbrgwb
     [towels patterns]))
 
 
+(defn p-valid?
+  [p T]
+  (let [psize (count p)
+        t-exact (some (fn [t] (and
+                                (= psize (count t))
+                                (= t p))) T)
+        t-smaller (filter (fn [t] (and
+                                    (< (count t) psize)
+                                    (every? identity (map = t p))))
+                                    T)
+        ]
+;;    (prn [:p p :finish t-exact :t-smaller t-smaller])
+    (or
+      t-exact
+      (some
+        (fn[t] (p-valid? (drop (count t) p) T))
+        t-smaller)
+    ))
+  )
+
 (defn d19p1
   [input]
-  (let [x (parse-input input)
+  (let [[T P] (parse-input input)
+        p (first P)
         ]
-    x
+    (->> P
+         (keep (fn [p] (p-valid? p T)))
+         count)
+
     ))
 
 (defn d19p2
@@ -50,7 +74,7 @@ bbrgwb
   (println "part1")
   (prn (d19p1 sample))
   (prn sol)
-  ;;  (prn (d19p1 (slurp "input/day19.txt")))
+  (prn (d19p1 (slurp "input/day19.txt")))
 
   ;;  (newline)
   ;;  (println "part2")
