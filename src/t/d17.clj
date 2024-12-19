@@ -38,7 +38,7 @@ Program: 0,3,5,4,3,0")
     (= 4 oprand) A
     (= 5 oprand) B
     (= 6 oprand) C
-    "7 or none of the above is pbm" (prn "Problem with oprand" oprand)))
+    "7 or none of the above is pbm" (throw (ex-info "Problem with oprand" {:combo oprand}))))
 
 (defn adv
   [A B C oprand p]
