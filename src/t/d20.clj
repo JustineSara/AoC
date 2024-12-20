@@ -140,7 +140,7 @@
                     [[wx (dec wy)] [wx (inc wy)]]
                     [[wx (inc wy)] [wx (dec wy)]]]
                  :when (every? test-point j)
-                 :when (<= 100 (- (+ (get fromS (first j)) (get toE (second j)) 2) sh-path))]
+                 :when (<= 100 (- sh-path (+ (get fromS (first j)) (get toE (second j)) 2)))]
              1
              ))))
 
