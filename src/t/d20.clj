@@ -5,29 +5,64 @@
     [clojure.set :as cljset]
     [clojure.core.match :refer [match]]))
 
-  (def sample "")
+(def sample
+"###############
+#...#...#.....#
+#.#.#.#.#.###.#
+#S#...#.#.#...#
+#######.#.#.###
+#######.#.#...#
+#######.#.###.#
+###..E#...#...#
+###.#######.###
+#...###...#...#
+#.#####.#.###.#
+#.#...#.#.#...#
+#.#.#.#.#.#.###
+#...#...#...###
+###############")
 
-  (defn parse-input
+(defn parse-input
   [input]
-  (cljstr/split-lines input)
-  )
-
-
-  (defn d20p1
-  [input]
-  (let [x (parse-input input)
-  ]
-  x
+  (let [lines (cljstr/split-lines input)
+        ymax (count lines)
+        xmax (count (first lines))
+        all-map (->> lines
+                     (map-indexed
+                       (fn [y l]
+                         (apply merge-with into
+                                (map-indexed
+                                  (fn [x c]
+                                    (case c
+                                      \S {:start [[x y]]}
+                                      \# {:walls [[x y]]}
+                                      \E {:end   [[x y]]}
+                                      {}))
+                                  l))))
+                     (apply merge-with into)) ]
+    {:walls (set (:walls all-map))
+     :S (first (:start all-map))
+     :E (first (:end all-map))
+     :xmax xmax
+     :ymax ymax}
   ))
 
-  (defn d20p2
+
+(defn d20p1
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn -main
+(defn d20p2
+  [input]
+  (let [x (parse-input input)
+        ]
+    x
+    ))
+
+(defn -main
   [& args]
   (println "day20")
   (println sample)
@@ -42,4 +77,4 @@
   ;;  (prn (d20p2 sample))
   ;;  (prn (d20p2 (slurp "input/day20.txt")))
   )
-  
+
