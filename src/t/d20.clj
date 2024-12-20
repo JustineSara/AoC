@@ -144,12 +144,97 @@
              1
              ))))
 
-(defn d20p2
-  [input]
-  (let [x (parse-input input)
+
+(defn all-cheat-a
+  [s walls xmax ymax maxsteps]
+  (loop [p [s]
+         pexplored #{s}
+         endcheat {}
+         steps 0]
+    (if (or (= steps maxsteps) (empty? p)) endcheat
+      (let [np (->> p
+                    (mapcat around)
+                    (filter (fn [[x y]] (inside? x y xmax ymax)))
+                    (filter (fn [pos] (not (contains? pexplored pos)))))
+            nwalls (->> np
+                        (filter walls)
+                        )
+            narr (->> np
+                      (filter #(not (contains? walls %)))
+                      (map (fn [pos] {pos (inc steps)}))
+                      (into {})
+                      )
+                    ]
+        (recur nwalls (apply conj pexplored np) (merge-with min endcheat narr) (inc steps))
+        ))))
+(comment
+  (let [{:keys [walls S E xmax ymax]} (parse-input
+"#####
+#...#
+#####
+###.#
+###.#
+#.#.#
+#...#
+#####")
         ]
-    x
-    ))
+  (all-cheat-a [1 1] walls xmax ymax)
+  ))
+
+
+(defn pt-at-dist
+  [x y dist]
+  (set
+  (mapcat
+    (fn [i] [[(+ x i) (+ y (abs(- dist i)))]
+             [(- x i) (+ y (abs(- dist i)))]
+             [(- x i) (- y (abs(- dist i)))]
+             [(+ x i) (- y (abs(- dist i)))]
+             ])
+    (range  (inc dist))
+  )))
+
+(defn d20p2
+  [input above]
+  (let [{:keys [walls S E xmax ymax]} (parse-input input)
+        toE (all-sh-paths E walls xmax ymax)
+        fromS (all-sh-paths S walls xmax ymax)
+        sh-path (get toE S)
+        test-point (fn [[x y]] (and (inside? x y xmax ymax) (not (contains? walls [x y]))))
+        ]
+    (prn sh-path)
+    (apply +
+
+           (for [x (range xmax)
+                 y (range ymax)
+                 :when (test-point [x y])
+                 :when (< (get fromS [x y]) (- sh-path above))
+                 j-size (range 2 21)
+                 j-end (pt-at-dist x y j-size)
+                 :when (test-point j-end)
+                 :when (<= above (- sh-path (+ (get fromS [x y]) (get toE j-end) j-size)))]
+             1
+             )
+           #_(for [x (range xmax)
+                 y (range ymax)
+                 :when (test-point [x y])
+                 :when (< (get fromS [x y]) (- sh-path above))
+                 j (all-cheat-a [x y] walls xmax ymax 20)
+                 ;; j is {point-after-cheat cheat-distance}
+                 :when (= above (- sh-path (+ (get fromS [x y]) (get toE (first j)) (second j) )))
+                 ]
+             (do
+;;               (comment
+              (prn [:s [x y] :fromStos (get fromS [x y]) :fromstoE (get toE [x y])])
+              (prn [:cheat j])
+              (prn [:e (first j) :frometoE (get toE (first j))])
+              (prn [:totalwithcheat (+ (get fromS [x y]) (get toE (first j)) (second j) )])
+              (read-line)
+  ;;            )
+               1
+             )
+             )))
+  )
 
 (defn -main
   [& args]
@@ -157,16 +242,19 @@
   (println sample)
   (newline)
 
+  (comment
   (println "part1")
   (prn (d20p1-sample sample))
   (prn (d20p1 (slurp "input/day20.txt")))
   ;; 1438
   ;; That's not the right answer; your answer is too high.
   ;; Curiously, it's the right answer for someone else; you might be logged in to the wrong account or just unlucky.
-
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d20p2 sample))
-  ;;  (prn (d20p2 (slurp "input/day20.txt")))
+)
+  (newline)
+  (println "part2")
+  (prn (d20p2 sample 50))
+  (prn (+ 32 31 29 39 25 23 20 19 12 14 12 22 4 3))
+  (prn (d20p2 (slurp "input/day20.txt") 100))
+  ;; test with program wrong on sample : 220996 --> too low, like on sample
   )
 
