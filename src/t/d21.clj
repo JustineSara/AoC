@@ -271,12 +271,30 @@
     (reduce + (map * cost-codes value-codes))
     ))
 
+(defn cost-one-code-robot
+  [c robot]
+    (->> c
+         (str "A")
+         (partition 2 1)
+         (map robot)
+         (apply +))
+  )
+
 (defn d21p2
   [input]
-  (let [x (parse-input input)
+  (let [codes (parse-input input)
+        h-cost human-cost
+        value-codes (map value-one-code codes)
+        r-cost (loop [cost h-cost
+                      nrobot 0]
+                 (if (= nrobot 25) cost
+                   (recur (all-dist pos-arrow cost [0 0]) (inc nrobot))))
+        last-robot (all-dist pos-num r-cost [0 3])
+        cost-codes (map (fn [c] (cost-one-code-robot c last-robot)) codes)
         ]
-    x
-    ))
+    (reduce + (map * cost-codes value-codes))
+    )
+  )
 
 (defn -main
   [& args]
@@ -284,13 +302,14 @@
   (println sample)
   (newline)
 
+  (comment
   (println "part1")
   (prn (d21p1 sample))
   (prn (d21p1 (slurp "input/day21.txt")))
-
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d21p2 sample))
-  ;;  (prn (d21p2 (slurp "input/day21.txt")))
+)
+  (newline)
+  (println "part2")
+  (prn (d21p2 sample))
+  (prn (d21p2 (slurp "input/day21.txt")))
   )
 
