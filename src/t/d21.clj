@@ -5,29 +5,34 @@
     [clojure.set :as cljset]
     [clojure.core.match :refer [match]]))
 
-  (def sample "")
+(def sample
+"029A
+980A
+179A
+456A
+379A")
 
-  (defn parse-input
+(defn parse-input
   [input]
   (cljstr/split-lines input)
   )
 
 
-  (defn d21p1
+(defn d21p1
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn d21p2
+(defn d21p2
   [input]
   (let [x (parse-input input)
-  ]
-  x
-  ))
+        ]
+    x
+    ))
 
-  (defn -main
+(defn -main
   [& args]
   (println "day21")
   (println sample)
@@ -42,4 +47,4 @@
   ;;  (prn (d21p2 sample))
   ;;  (prn (d21p2 (slurp "input/day21.txt")))
   )
-  
+
