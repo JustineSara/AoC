@@ -41,15 +41,31 @@ td-yn")
 
 (defn parse-input
   [input]
-  (cljstr/split-lines input)
-  )
+  ( update-vals
+    (->>
+      (cljstr/split-lines input)
+      (map (fn [s] (let [[c1 c2] (cljstr/split s #"-")]
+                     {c1 [c2] c2 [c1]})))
+      (apply merge-with concat))
+    set))
 
 
 (defn d23p1
   [input]
   (let [x (parse-input input)
+        cs (keys x)
+        ts (->> cs
+                (filter (fn [s] (= (first s) \t))))
         ]
-    x
+    (->>
+      (for [t ts
+            c1 (x t)
+            c2 (x t)
+            :when (not= c1 c2)
+            :when (contains? (x c1) c2)]
+        #{t c1 c2})
+      set
+      count)
     ))
 
 (defn d23p2
@@ -67,7 +83,7 @@ td-yn")
 
   (println "part1")
   (prn (d23p1 sample))
-  ;;  (prn (d23p1 (slurp "input/day23.txt")))
+  (prn (d23p1 (slurp "input/day23.txt")))
 
   ;;  (newline)
   ;;  (println "part2")
