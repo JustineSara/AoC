@@ -68,11 +68,49 @@ td-yn")
       count)
     ))
 
+
+
+(defn parse-input-2
+  [input]
+    (->>
+      (cljstr/split-lines input)
+      (mapcat (fn [s] (let [[c1 c2] (cljstr/split s #"-")]
+                     [[c1 c2] [c2 c1]])))
+      set
+      ))
+
+
+(defn add-c
+  [g cs p]
+  (keep
+   (fn [c] (when (every? (fn [cg] (contains? p [cg c])) g) (conj g c)))
+    cs
+        ))
+
+
 (defn d23p2
   [input]
-  (let [x (parse-input input)
+  (let [pairs (parse-input-2 input)
+        cs (keys (parse-input input))
+        add-cs-to-g (fn [g] (add-c g cs pairs))
         ]
-    x
+
+    (->>
+    (loop [gps pairs]
+      (let [ngpr (->> gps
+                      (mapcat add-cs-to-g)
+                      (map set)
+                      set)]
+        (if (empty? ngpr) gps
+          (recur ngpr)))
+
+      )
+    first
+    vec
+    sort
+    (interpose ",")
+    (apply str)
+    )
     ))
 
 (defn -main
@@ -81,13 +119,15 @@ td-yn")
   (println sample)
   (newline)
 
+  (comment
   (println "part1")
   (prn (d23p1 sample))
   (prn (d23p1 (slurp "input/day23.txt")))
+  )
 
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d23p2 sample))
-  ;;  (prn (d23p2 (slurp "input/day23.txt")))
+  (newline)
+  (println "part2")
+  (prn (d23p2 sample))
+  (prn (d23p2 (slurp "input/day23.txt")))
   )
 
