@@ -87,11 +87,52 @@
              (nth (iterate next-sn sn) 2000))
            )))
 
+
+(def sample2
+"1
+2
+3
+2024")
+(def sol2 23)
+
+(defn price
+  [v]
+  (parse-long (str (last (str v)))))
+(comment (price 2376))
+
+(defn all-combo
+  [sn]
+  (let [all-prices (take 2000 (map price (iterate next-sn sn)))
+        all-diff (map - (rest all-prices) all-prices )
+        ]
+    (loop [i 4
+           saved {}
+           ]
+      (if (= i 2000) saved
+        (let [combo (take 4 (drop (- i 4) all-diff))
+              price (nth all-prices i)]
+          (if (contains? saved combo)
+            (recur (inc i) saved)
+            (recur (inc i) (assoc saved combo price)))
+          )))))
+(comment
+(all-combo 123)
+  )
+
+
+
 (defn d22p2
   [input]
   (let [x (parse-input input)
         ]
-    x
+    (loop [sn-s x
+           combo-values {}]
+      (if (empty? sn-s) (apply max (vals combo-values))
+        (let [[sn & sn-s] sn-s
+              combos (all-combo sn)]
+          (recur sn-s (merge-with + combo-values combos))))
+
+      )
     ))
 
 (defn -main
@@ -100,14 +141,16 @@
   (println sample)
   (newline)
 
+  (comment
   (println "part1")
   (prn (d22p1 sample))
   (prn sol)
   (prn (d22p1 (slurp "input/day22.txt")))
-
-  ;;  (newline)
-  ;;  (println "part2")
-  ;;  (prn (d22p2 sample))
-  ;;  (prn (d22p2 (slurp "input/day22.txt")))
+)
+  (newline)
+  (println "part2")
+  (prn (d22p2 sample2))
+  (prn sol2)
+  (prn (d22p2 (slurp "input/day22.txt")))
   )
 
