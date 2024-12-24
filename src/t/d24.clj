@@ -158,7 +158,7 @@ tnw OR pbm -> gnj")
     (loop [trust-g []
            un-g (set gates)
            i 0]
-      (if (> i 46) (prn "The End")
+      (if (= i 46) (prn "The End")
       (let [z (format "z%02d" i)
             test-g (get-gates z un-g)
             _ (prn [:iter i :z z :n-trusted (count trust-g) :test test-g])
@@ -178,7 +178,7 @@ tnw OR pbm -> gnj")
                                            (recur wi (concat gs [g]))
                                            (recur (assoc wi wo (OP op v1 v2)) gs)))))
                                 ]]
-                      (= (get wi z) (first (sum x y (if (zero? i) false r))))))
+                      (= (get wi z) (first (sum (if (= 45 i) false x) (if (= 45 i) false y) (if (zero? i) false r))))))
           (recur (concat trust-g test-g) (apply disj un-g test-g) (inc i))
           (prn [:test-g test-g])
           )
