@@ -132,94 +132,60 @@ tnw OR pbm -> gnj")
         (recur nkg nws))
     )))
 
+(defn build-xy
+  [x y r i]
+  (if (zero? i) {"x00" x "y00" y}
+    (merge {(format "x%02d" i) x (format "y%02d" i) y (format "y%02d" (dec i)) r (format "x%02d" (dec i)) r}
+           (apply merge
+                  (for [ii (range (dec i))]
+                    {(format "x%02d" ii) false (format "y%02d" ii) false}))
+           )))
+(comment
+  (build-xy true true true 0)
+  (build-xy true true true 1)
+  (build-xy true false true 2)
+  )
+
 (defn d24p2
   [input]
   (let [[_ gates] (parse-input input)
         ]
 
-    (let [x "x00"
-          y "y00"
-          z "z00"
-          r nil
-          next-r
-      (for [g gates]
-        (match g
-          [x y "XOR" z] (prn [:good g])
-          [y x "XOR" z] (prn [:good g])
-          [x y op z] (prn [:pbm g])
-          [y x op z] (prn [:pbm g])
-          [x y "AND" nr] (do (prn [:good g]) nr)
-          [y x "AND" nr] (do (prn [:good g]) nr)
-          _ nil)
-        )]
-      (first (keep identity next-r)))
-    (let [x "x01"
-          y "y01"
-          z "z01"
-          r "rjr"
-          next-r
-          (for [g gates]
-            (match g
-              [x y op _] (prn [:good g])
-              [y x op _] (prn [:good g])
-              [_ r op _] (prn [:pbm g])
-              [r _ op _] (prn [:pbm g])
-              [_ _ _ z] (prn [:pbm g])
-              _ nil)
-            )]
-      (first (keep identity next-r)))
-
-    (let [trust-g []
-          un-g (set gates)
-          x false
-          y false
-          wi {"x00" x "y00" y}
-          z "z00"
-          t-wi (loop [wi wi
-                      gs trust-g]
-                 (if (empty? gs) wi
-                   (let [[[w1 w2 op wo :as g] & gs] gs
-                         v1 (wi w1)
-                         v2 (wi w2)]
-                     (if (or (nil? v1) (nil? v2))
-                       (recur wi (concat gs [g]))
-                       (recur (assoc wi wo (OP op v1 v2)) gs)))))]
-
-      (loop [wi t-wi
-             tested-g []
-             gs (vec un-g)]
-        (if (contains? wi z) [:tested-g tested-g :z z (wi z) :expected (sum false false false)]
-          (let [[[w1 w2 op wo :as g] & gs] gs
-                v1 (wi w1)
-                v2 (wi w2)]
-            (if (or (nil? v1) (nil? v2))
-              (recur wi tested-g (concat gs [g]))
-              (recur (assoc wi wo (OP op v1 v2)) (conj tested-g g) gs)))))
+    (comment
+      (prn (get-gates "z01" gates))
+      (prn (get-gates "z02" gates))
       )
-    (get-gates "z01" gates)
+    (loop [trust-g []
+           un-g (set gates)
+           i 0]
+      (if (> i 46) (prn "The End")
+      (let [z (format "z%02d" i)
+            test-g (get-gates z un-g)
+            _ (prn [:iter i :z z :n-trusted (count trust-g) :test test-g])
+            ]
+        (if (every? true?
+                    (for [x [false true]
+                          y [false true]
+                          r [false true]
+                          :let [wi (build-xy x y r i)
+                                wi (loop [wi wi
+                                          gs (concat trust-g test-g)]
+                                     (if (empty? gs) wi
+                                       (let [[[w1 w2 op wo :as g] & gs] gs
+                                             v1 (wi w1)
+                                             v2 (wi w2)]
+                                         (if (or (nil? v1) (nil? v2))
+                                           (recur wi (concat gs [g]))
+                                           (recur (assoc wi wo (OP op v1 v2)) gs)))))
+                                ]]
+                      (= (get wi z) (first (sum x y (if (zero? i) false r))))))
+          (recur (concat trust-g test-g) (apply disj un-g test-g) (inc i))
+          (prn [:test-g test-g])
+          )
+          ))
+)
 
-    ;; test z00
-    #_(loop [wi {"x00" 0 "y00" 0}
-           gs (vec gates)]
-      (if (get wi "z00") [:found (get wi "z00") :expected (sum 0 0 0)]
-        (let [[[w1 w2 op wo :as g] & gs] gs
-              v1 (wi w1)
-              v2 (wi w2)]
-          (if (or (nil? v1) (nil? v2))
-            (recur wi (concat gs [g]))
-            (do
-          (prn g)
-            (recur (assoc wi wo (OP op v1 v2)) gs)))))
-      )
-    #_(loop [source ["z10"]]
-      (if (empty? source) 0
-      (let [n-sources (mapcat
-                        (fn [s] (apply concat (keep (fn [[w1 w2 _ wo]] (when (= wo s) [w1 w2])) gates)))
-                        source)]
-        (prn n-sources)
-        (recur (filter #(and (not= (first %) \x) (not= (first %) \y)) n-sources))
-      ))
-    )))
+    ))
 
 (defn -main
   [& args]
@@ -238,6 +204,6 @@ tnw OR pbm -> gnj")
   (newline)
   (println "part2")
   ;;  (prn (d24p2 sample))
-  (prn (d24p2 (slurp "input/day24.txt")))
+  (prn (d24p2 (slurp "input/day24-p2.txt")))
   )
 
