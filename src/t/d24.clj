@@ -187,6 +187,125 @@ tnw OR pbm -> gnj")
 
     ))
 
+(defn compute-wires
+  [wi gates]
+  (loop [wi wi
+         gs (vec gates)]
+    (if (empty? gs) wi
+      (let [[[w1 w2 op wo :as g] & gs] gs
+            v1 (wi w1)
+            v2 (wi w2)]
+        (if (or (nil? v1) (nil? v2))
+          (recur wi (concat gs [g]))
+          (recur (assoc wi wo (OP op v1 v2)) gs))))))
+
+(defn compute-wires-for-z
+  [wi gates z]
+  (loop [wi wi
+         gs (set gates)]
+    (if
+      (or (contains? wi z) (empty? gs))
+      wi
+      (let [
+            v-gs (filter (fn [[w1 w2 _ _]] (and (contains? wi w1) (contains? wi w2))) gs)
+            [w1 w2 op wo :as g] (first v-gs)
+            ]
+        (if (nil? g)
+          nil
+          (recur (assoc wi wo (OP op (wi w1) (wi w2))) (disj gs g)))))))
+
+(defn swap-wo
+  [ag bg]
+  (let [[aw1 aw2 aop awo] ag
+        [bw1 bw2 bop bwo] bg]
+    [[awo bwo] [aw1 aw2 aop bwo] [bw1 bw2 bop awo]]))
+(comment
+  (swap-wo ["ain" "a1n" "AND" "bbo"] ["bin" "b1n" "XOR" "aao"])
+  )
+
+(defn find-swap
+  [wi g z expected]
+  (let [setg (set g)]
+    (loop [g1s g
+           g2s (rest g)
+           gswaps []]
+      (cond
+       (empty? g1s) gswaps
+        (empty? g2s) (recur (rest g1s) (rest (rest g1s)) gswaps)
+        :else
+        (let [g1 (first g1s)
+              [g2 & g2s] g2s
+              [sw ng1 ng2] (swap-wo g1 g2)
+              ng (conj (disj setg g1 g2) ng1 ng2)
+              wi-all (compute-wires-for-z wi ng z)
+              ]
+          #_(when (or (= sw ["z27" "bfq"])
+                  (= sw ["bfq" "z27"])) (prn [sw expected (wi-all z)]))
+          (if (or (nil? wi-all)
+                  (not= expected (wi-all z)))
+            (recur g1s g2s gswaps)
+            (recur g1s g2s (conj gswaps [sw g1 g2 ng1 ng2]))
+            ))))))
+
+(defn d24p2-auto
+  [input]
+  (let [[_ gates] (parse-input input)
+        ]
+    (->>
+      (loop [trust-g []
+             un-g (set gates)
+             swapped []
+             i 0]
+        (if (= i 46) (do (prn "The End") swapped)
+          (let [z (format "z%02d" i)
+                test-g (get-gates z un-g)
+                _ (prn [:iter i :z z :n-trusted (count trust-g) :test test-g])
+                isok? (every? true?
+                              (for [x [false true]
+                                    y [false true]
+                                    r [false true]
+                                    :let [wi (build-xy x y r i)
+                                          wi (compute-wires wi trust-g)
+                                          wi-all (compute-wires wi test-g)
+                                          z-found (get wi-all z)
+                                          expected (first (sum (if (= 45 i) false x) (if (= 45 i) false y) (if (zero? i) false r)))
+                                          ]]
+                                (= z-found expected)))]
+            (if isok?
+              (recur (concat trust-g test-g) (apply disj un-g test-g) swapped (inc i))
+              (let [swaps (for [x [false true]
+                                y [false true]
+                                r [false true]
+                                :let [wi (build-xy x y r i)
+                                      wi (compute-wires wi trust-g)
+                                      expected (first (sum (if (= 45 i) false x) (if (= 45 i) false y) (if (zero? i) false r)))
+                                      ]]
+                            (find-swap wi
+                                       ;;                                 (if (= i 45)
+                                       ;;                                 test-g
+                                       un-g
+                                       ;;                                    (concat test-g (get-gates (format "z%02d" (inc i)) un-g)))
+                                       z expected))
+                    ;;       _ (prn (map count swaps))
+                    ;;     _ (prn (map (fn [l] (map (fn [[sw & _]] sw) l)) (filter #(< (count %) 10) swaps)))
+                    [sw g1 g2 ng1 ng2] (->> swaps
+                                            (map set)
+                                            (apply cljset/intersection)
+                                            first
+                                            )
+                    _ (prn [:one-swap sw])
+                    ]
+                ;; (read-line)
+                (recur trust-g (conj (disj un-g g1 g2) ng1 ng2) (concat swapped sw) i))
+              )
+            ))
+        )
+      sort
+      (interpose ",")
+      (apply str)
+
+      )))
+
 (defn -main
   [& args]
   (println "day24")
@@ -204,6 +323,7 @@ tnw OR pbm -> gnj")
   (newline)
   (println "part2")
   ;;  (prn (d24p2 sample))
-  (prn (d24p2 (slurp "input/day24-p2.txt")))
+  ;; (prn (d24p2 (slurp "input/day24-p2.txt")))
+  (prn (d24p2-auto (slurp "input/day24.txt")))
   )
 
