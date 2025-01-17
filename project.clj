@@ -5,6 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.12.0"]
                  [org.clojure/core.match "1.1.0"]]
+  :plugins [[lein-auto "0.1.3"]]
   :main ^:skip-aot t.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all
